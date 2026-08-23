@@ -1,0 +1,65 @@
+server:
+  port: 8080
+
+spring:
+  application:
+    name: devpilot
+
+  datasource:
+    url: jdbc:postgresql://localhost:5433/devpilot
+    username: devpilot
+    password: ${DB_PASSWORD:}
+    driver-class-name: org.postgresql.Driver
+
+  jpa:
+    hibernate:
+      ddl-auto: update
+    show-sql: false
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.PostgreSQLDialect
+        format_sql: true
+
+  security:
+    oauth2:
+      client:
+        registration:
+          github:
+            client-id: ${GITHUB_CLIENT_ID:}
+            client-secret: ${GITHUB_CLIENT_SECRET:}
+            scope: read:user,repo
+            redirect-uri: "http://localhost:5173/api/auth/github/callback"
+        provider:
+          github:
+            authorization-uri: https://github.com/login/oauth/authorize
+            token-uri: https://github.com/login/oauth/access_token
+            user-info-uri: https://api.github.com/user
+
+  ai:
+    openai:
+          api-key: ${AI_API_KEY:}
+      base-url: https://generativelanguage.googleapis.com/v1beta/openai
+      chat:
+        completions-path: /chat/completions
+        options:
+          model: gemini-2.5-flash
+          temperature: 0.3
+      embedding:
+        options:
+          model: gemini-embedding-001
+          dimensions: 768
+    vectorstore:
+      pgvector:
+        initialize-schema: true
+        index-type: HNSW
+        distance-type: COSINE_DISTANCE
+        dimensions: 768
+
+app:
+  encryption-key: ${ENCRYPTION_KEY:0123456789abcdef0123456789abcdef}
+  github:
+    token: ${GITHUB_TOKEN:}
+  frontend-url: ${FRONTEND_URL:http://localhost:5173}
+  cors:
+    allowed-origins: ${CORS_ORIGINS:http://localhost:5173}
+
